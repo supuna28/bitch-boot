@@ -63,11 +63,7 @@ fetch(`http://ip-api.com/line`).then(res => res.text())
     denz.on('close', async () => {
         console.log(color('|TRM|'), color('Disconnected.', 'cyan'))
         })
-    
-	if (!settings.autoplaymusic) {
-exec(`cd /sdcard/download && play *mp3`)
-}
-   
+
    denz.on('chat-update', async (mek) => {
         require('./denz.js')(denz, mek)
         ownerNumber = ["6285866295942@s.whatsapp.net","6283125187277@s.whatsapp.net",`${settings.NomorOwner}@s.whatsapp.net`]
@@ -116,7 +112,7 @@ denz.on('CB:action,,call', async json => {
         })
         
 	denz.on('message-delete', async (m) => {
-if (!m.key.fromMe && !antidelete) {
+if (!m.key.fromMe && antidelete) {
 if (!m.key.remoteJid == 'status@broadcast') return
 m.message = (Object.keys(m.message)[0] === 'ephemeralMessage') ? m.message.ephemeralMessage.message : m.message
 const jam = moment.tz('Asia/Jakarta').format('HH:mm:ss')

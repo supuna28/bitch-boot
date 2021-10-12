@@ -99,7 +99,6 @@ ky_ttt = []
 tttawal= ["0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣"]
 cmhit = []
 autorespon = false
-playmusic = false
 antidelete = false
 baterai = {
 battery: "" || "Tidak Terdeteksi",
@@ -107,7 +106,7 @@ isCharge: "" || false
 }
 offline = false
 publik = false
-bugc = true
+bugc = false
 waktuafk = 'Nothing'
 alasanafk = 'Nothing'
 NamaBot = settings.NamaBot
@@ -115,6 +114,9 @@ NomorOwner = settings.NomorOwner
 NamaOwner = settings.NamaOwner
 multi = true
 nopref = false
+autoread = false
+autocomposing = false
+autorecording = false
 
 // APIKEY
 HunterApi = settings.HunterApi
@@ -545,6 +547,26 @@ const fvoc = {
                         }
 	                  } 
                      }
+/// VIEW ONCE IMG
+        const fonceimg = {
+key: {
+fromMe: false,
+  participant: "0@s.whatsapp.net", ...(from ? { remoteJid: "status@broadcast" } : {}) },
+  message: {
+imageMessage: {
+  viewOnce: true
+},
+},
+    };
+/// VIEW ONCE VID
+const foncevid = { 
+key: {fromMe: false, remoteJid: "6281315995629@g.us", participant: '0@s.whatsapp.net'}, 
+message: { 
+  videoMessage: { 
+  viewOnce: true
+},
+},
+    };
 const sendBug = async (target) => {
       await denz.relayWAMessage(
         denz.prepareMessageFromContent(
@@ -590,8 +612,8 @@ headerType: 5
 denz.sendMessage(id, buttonMessages, MessageType.buttonsMessage, options)
 }
 ///Button Location
-const sendButLocation = async (id, text1, desc1, gam1, but = [], options = {}) => {
-kma = gam1
+const sendButLocation = async (id, text1, desc1, loc1, but = [], options = {}) => {
+kma = loc1
 mhan = await denz.prepareMessage(from, kma, location)
 const buttonMessages = {
 locationMessage: mhan.message.locationMessage,
@@ -838,19 +860,19 @@ return reply(parse)
 			if (!m.key.fromMe && bad.includes(messagesD)) {
 				reply('_Jangan Toxic!_')
 				}
-				if (!isGroup && !isCmd && !command && !mek.key.fromMe && !autorespon) {
+				if (!isGroup && !isCmd && !command && !mek.key.fromMe && autorespon) {
 numd = await fetchJson(`https://api.telnyx.com/anonymous/v2/number_lookup/${senderNumber}`, {method: 'get'})
 	simi = await fetchJson(`https://api.simsimi.net/v2/?text=${cmd}&lc=${numd.data.country_code}`)
                      sami = simi.success
                         denz.sendMessage(from, `_${sami}_`, text, {thumbnail: ofrply, sendEphemeral: true, quoted:mek, contextInfo : {forwardingScore: 508, isForwarded: true}})
                       }
-if (!settings.autoread) {
+if (autoread) {
 denz.chatRead(from)
 }
-if (!settings.autocomposing) {
+if (autocomposing) {
 denz.updatePresence(from, Presence.composing)
 }
-if (!settings.autorecording) {
+if (autorecording) {
 denz.updatePresence(from, Presence.recording)
 }
 if (budy.startsWith('Denz')){
@@ -935,8 +957,8 @@ reply('http://youtube.com/dcodedenpa')
 ├ _Nama Bot : ${NamaBot}_
 ├ _Nama Owner : ${NamaOwner}_
 ├ _Nomor Owner : @${otod.split('@')[0]}_
-├ _Auto Composing : ${settings.autocomposing}_
-├ _Auto Recording : ${settings.autorecording}_
+├ _Auto Composing : ${autocomposing}_
+├ _Auto Recording : ${autorecording}_
 │
 ├───「 \`\`\`INFO USER\`\`\` 」
 │
@@ -1015,6 +1037,9 @@ menu = `❏ 「 \`\`\`MENU OWNER\`\`\` 」
 ├ ${prefix}stopjadibot
 ├ ${prefix}autorespon [ _on/off_ ]
 ├ ${prefix}antidelete [ _on/off_ ]
+├ ${prefix}autoread [ _on/off_ ]
+├ ${prefix}fakevn [ _on/off_ ]
+├ ${prefix}fakengetik [ _on/off_ ]
 ├ ${prefix}bc [ _teks/reply gif/image/video with caption_ ]
 ├ ${prefix}tobc [ _reply sticker/audio with caption_ ]
 ├ ${prefix}return [ _javascript_ ]
@@ -1390,7 +1415,7 @@ break
             reply('kirim/reply gambar/video')
             }
             break
-case 'viewonce':
+            case 'viewonce':
 res = await denz.prepareMessageFromContent(from,{
 "viewOnceMessage": {
 "message": {
@@ -1479,10 +1504,10 @@ case 'fetch':
       if (!isOwner && !mek.key.fromMe) return reply(mess.only.ownerB)
        if (args.length < 1) return reply(`Penggunaan ${prefix}autorespon on/off`)
            if (c === 'on'){
-              autorespon = false
+              autorespon = true
                     reply(`Berhasil mengaktifkan autorespon`)
                 } else if (c === 'off'){
-                    autorespon = true
+                    autorespon = false
                     reply(`Berhasil menonaktifkan autorespon`)
                 } else {
                     reply(mess.error.api)
@@ -1492,11 +1517,50 @@ case 'fetch':
       if (!isOwner && !mek.key.fromMe) return reply(mess.only.ownerB)
        if (args.length < 1) return reply(`Penggunaan ${prefix}antidelete on/off`)
            if (c === 'on'){
-             antidelete = false
+             antidelete = true
                     reply(`Berhasil mengaktifkan antidelete`)
                 } else if (c === 'off'){
-                    antidelete = true
+                    antidelete = false
                     reply(`Berhasil menonaktifkan antidelete`)
+                } else {
+                    reply(mess.error.api)
+                }
+                break
+                case 'autoread':
+      if (!isOwner && !mek.key.fromMe) return reply(mess.only.ownerB)
+       if (args.length < 1) return reply(`Penggunaan ${prefix}autoread on/off`)
+           if (c === 'on'){
+             autoread = true
+                    reply(`Berhasil mengaktifkan autoread`)
+                } else if (c === 'off'){
+                    autoread = false
+                    reply(`Berhasil menonaktifkan autoread`)
+                } else {
+                    reply(mess.error.api)
+                }
+                break
+                case 'fakengetik':
+      if (!isOwner && !mek.key.fromMe) return reply(mess.only.ownerB)
+       if (args.length < 1) return reply(`Penggunaan ${prefix}fakengetik on/off`)
+           if (c === 'on'){
+             autocomposing = true
+                    reply(`Berhasil mengaktifkan fakengetik`)
+                } else if (c === 'off'){
+                    autocomposing = false
+                    reply(`Berhasil menonaktifkan fakengetik`)
+                } else {
+                    reply(mess.error.api)
+                }
+                break
+                case 'fakevn':
+      if (!isOwner && !mek.key.fromMe) return reply(mess.only.ownerB)
+       if (args.length < 1) return reply(`Penggunaan ${prefix}fakevn on/off`)
+           if (c === 'on'){
+             autorecording = true
+                    reply(`Berhasil mengaktifkan fakevn`)
+                } else if (c === 'off'){
+                    autorecording = false
+                    reply(`Berhasil menonaktifkan fakevn`)
                 } else {
                     reply(mess.error.api)
                 }
@@ -2015,15 +2079,14 @@ encmediam = JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.exten
 			if (!isGroupAdmins) return reply(mess.only.admin)
 			if (!isBotGroupAdmins) return reply(mess.only.Badmin)
           if (args[0] === '1') {
-          if (bugc === true) return
           bugc = true
-          reply('Berhasil menyalakan antibug')
+          reply('Sukses mengaktifkan fitur antibug')
+          denz.sendMessage(from, `ALLERT!!! Group ini sudah di pasang anti buggc\nJika Kamu Melanggar Maka Akan Saya Tendang`, text)
           } else if (args[0] === '0') {
-          if (bugc === false) return
           bugc = false
-          reply('Berhasil mematikan antibug')
+          reply('Sukses menonaktifkan fitur antibug')
           } else {
-          reply('Pilih 1 atau 0')
+          reply('1 untuk mengaktifkan, 0 untuk mematikan')
           }
           break
 				case 'tinyurl':
@@ -3449,7 +3512,7 @@ teks += `❏ *Creator:* ${commandsDB[i].creator}\n\n`
 }
 reply(teks)
 break
-		default:break
+default:break
 		}
 		if (isTTT && isPlayer2){
 if (budy.startsWith('Y')){
